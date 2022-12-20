@@ -4,10 +4,17 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"flag"
+	"fmt"
 	"os"
 
+	"github.com/golang/glog"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
+
+// config for whole program
+var cfgFile string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -26,13 +33,38 @@ func Execute() {
 }
 
 func init() {
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
-
-	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.eth-exporter.yaml)")
-
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
+	cobra.OnInitialize(initConfig)
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is .eth-exporter.yaml)")
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}
+
+func initConfig() {
+	if cfgFile != "" {
+		viper.SetConfigFile(cfgFile)
+	} else {
+		pwd, err := os.Getwd()
+		cobra.CheckErr(err)
+		viper.AddConfigPath(pwd)
+		viper.SetConfigType("yaml")
+		viper.SetConfigName(".eth-exporter")
+	}
+	viper.SetDefault("app.name", "eth-exporter")
+	viper.SetDefault("app.log", "/var/log/eth-exporter")
+
+	if err := viper.ReadInConfig(); err == nil {
+		logPath := viper.GetString("app.log")
+		_, err := os.Stat(logPath)
+		if err != nil {
+			err := os.MkdirAll(logPath, 0766)
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+		}
+		defer glog.Flush()
+		flag.Set("log_dir", logPath)
+		flag.Set("alsologtostderr", "true")
+		flag.Parse()
+		glog.Infoln("Using config file:", viper.ConfigFileUsed())
+	}
 }
