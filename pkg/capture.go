@@ -2,7 +2,9 @@ package pkg
 
 import (
 	"log"
+	"time"
 
+	"github.com/golang/glog"
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
 	"github.com/google/gopacket/pcap"
@@ -14,6 +16,7 @@ func Capture() {
 		log.Fatal(err)
 	}
 	defer handle.Close()
+	glog.Infoln("start capture", time.Now())
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 	for packet := range packetSource.Packets() {
 		ipLayer := packet.Layer(layers.LayerTypeIPv4)
@@ -27,4 +30,5 @@ func Capture() {
 			flush2influxdb(url, token, org, bucket, mm)
 		}
 	}
+	glog.Infoln("end capture", time.Now())
 }
