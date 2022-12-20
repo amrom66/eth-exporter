@@ -12,7 +12,7 @@ func flush2influxdb(url string, token string, org string, bucket string, mypomyp
 	client = influxdb2.NewClient(url, token)
 	writeAPI := client.WriteAPI(org, bucket)
 	p := influxdb2.NewPointWithMeasurement("mypacket").
-		AddTag("instance", instance).
+		AddTag("instance", Instance).
 		AddField("src", mypomypacket.src).
 		AddField("dst", mypomypacket.dst).
 		AddField("protocol", mypomypacket.protocol).

@@ -11,7 +11,7 @@ import (
 )
 
 func Capture() {
-	handle, err = pcap.OpenLive(device, snapshotLen, promiscuous, timeout)
+	handle, err := pcap.OpenLive(Device, snapshotLen, promiscuous, timeout)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -27,7 +27,7 @@ func Capture() {
 				ip.DstIP.String(),
 				ip.Protocol.String(),
 			}
-			flush2influxdb(url, token, org, bucket, mm)
+			flush2influxdb(Url, Token, Org, Bucket, mm)
 		}
 	}
 	glog.Infoln("end capture", time.Now())

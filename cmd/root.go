@@ -11,9 +11,10 @@ import (
 	"github.com/golang/glog"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	pkg "github.com/amrom66/eth-exporter/pkg"
 )
 
-// config for whole program
+// config for program
 var cfgFile string
 
 // rootCmd represents the base command when called without any subcommands
@@ -67,4 +68,11 @@ func initConfig() {
 		flag.Parse()
 		glog.Infoln("Using config file:", viper.ConfigFileUsed())
 	}
+
+	pkg.Device = viper.GetString("app.instance.device")
+	pkg.Token = viper.GetString("app.db.token")
+	pkg.Url = viper.GetString("app.db.url")
+	pkg.Bucket = viper.GetString("app.db.bucket")
+	pkg.Org = viper.GetString("app.db.org")
+	pkg.Instance = viper.GetString("app.db.instance")
 }
