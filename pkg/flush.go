@@ -9,9 +9,7 @@ import (
 var client influxdb2.Client
 
 func flush2influxdb(mm mypacket) {
-	client = influxdb2.NewClient(Url, Token)
 	writeAPI := client.WriteAPI(Org, Bucket)
-
 	p := influxdb2.NewPointWithMeasurement("mypacket").
 		AddTag("instance", Instance).
 		AddField("src", mm.src).
@@ -19,4 +17,9 @@ func flush2influxdb(mm mypacket) {
 		AddField("protocol", mm.protocol).
 		SetTime(time.Now())
 	writeAPI.WritePoint(p)
+}
+
+func Init() {
+	client = influxdb2.NewClient(Url, Token)
+	client.Options().SetRetryInterval(1000)
 }

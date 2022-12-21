@@ -12,6 +12,8 @@ import (
 func Capture() {
 	ch := make(chan gopacket.Packet, 1000)
 
+	Init()
+
 	handle, err = pcap.OpenLive(Device, snapshotLen, promiscuous, timeout)
 	if err != nil {
 		log.Fatal(err)
