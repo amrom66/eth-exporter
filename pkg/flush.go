@@ -8,14 +8,15 @@ import (
 
 var client influxdb2.Client
 
-func flush2influxdb(url string, token string, org string, bucket string, mypomypacket mypacket) {
-	client = influxdb2.NewClient(url, token)
-	writeAPI := client.WriteAPI(org, bucket)
+func flush2influxdb(mm mypacket) {
+	client = influxdb2.NewClient(Url, Token)
+	writeAPI := client.WriteAPI(Org, Bucket)
+
 	p := influxdb2.NewPointWithMeasurement("mypacket").
 		AddTag("instance", Instance).
-		AddField("src", mypomypacket.src).
-		AddField("dst", mypomypacket.dst).
-		AddField("protocol", mypomypacket.protocol).
+		AddField("src", mm.src).
+		AddField("dst", mm.dst).
+		AddField("protocol", mm.protocol).
 		SetTime(time.Now())
 	writeAPI.WritePoint(p)
 }

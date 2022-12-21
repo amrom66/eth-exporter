@@ -7,4 +7,5 @@ import "github.com/amrom66/eth-exporter/cmd"
 
 func main() {
 	cmd.Execute()
+
 }

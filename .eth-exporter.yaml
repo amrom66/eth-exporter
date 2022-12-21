@@ -3,12 +3,12 @@ app:
   log: "/var/log/eth-exporter"
   port: "9119"
 
-instance:
-  ip: "10.4.2.135"
-  device: "eth0"
+  instance:
+    ip: "10.4.2.135"
+    device: "eth0"
 
-db:
-  token: "kb5IYxUwMSkETAFDz6YRj_FYdiFB9Tec_AiKej1h1s7Q9x_g6ol74YwUoAqUHZQ8UXa1UnCaLGCK3DoYM6PN1w"
-  url: "http://10.4.2.135:8086"
-  bucket: "amrom"
-  org: "amrom"
+  db:
+    token: "ZBQbf0tUGAvL54dTjWPnWg-92yDjk6XyCmFg4ytWD_jm8EsSqU3xwAGunKXP4naxKI4eJ2so_Hta-Z5hJtMJGQ=="
+    url: "http://10.4.2.135:8086"
+    bucket: "amrom"
+    org: "amrom"

@@ -10,8 +10,9 @@ var (
 	Device      string
 	snapshotLen int32         = 1024
 	promiscuous bool          = false
-	timeout     time.Duration = 15 * time.Second
+	timeout     time.Duration = 1 * time.Second
 	handle      *pcap.Handle
+	err         error
 
 	Token    string
 	Url      string

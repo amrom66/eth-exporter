@@ -1,34 +1,50 @@
 package pkg
 
 import (
+	"fmt"
 	"log"
-	"time"
 
-	"github.com/golang/glog"
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
 	"github.com/google/gopacket/pcap"
 )
 
 func Capture() {
-	handle, err := pcap.OpenLive(Device, snapshotLen, promiscuous, timeout)
+	ch := make(chan gopacket.Packet, 1000)
+
+	handle, err = pcap.OpenLive(Device, snapshotLen, promiscuous, timeout)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer handle.Close()
-	glog.Infoln("start capture", time.Now())
-	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
-	for packet := range packetSource.Packets() {
-		ipLayer := packet.Layer(layers.LayerTypeIPv4)
-		if ipLayer != nil {
-			ip, _ := ipLayer.(*layers.IPv4)
-			var mm = mypacket{
-				ip.SrcIP.String(),
-				ip.DstIP.String(),
-				ip.Protocol.String(),
-			}
-			flush2influxdb(Url, Token, Org, Bucket, mm)
+
+	go func() {
+		packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
+		for packet := range packetSource.Packets() {
+			ch <- packet
 		}
-	}
-	glog.Infoln("end capture", time.Now())
+	}()
+
+	// flush data to influxdb
+	go func() {
+		for {
+			packet, ok := <-ch
+			if !ok {
+				fmt.Println("channel has been clonsed.")
+				break
+			}
+			ipLayer := packet.Layer(layers.LayerTypeIPv4)
+			if ipLayer != nil {
+				ip, _ := ipLayer.(*layers.IPv4)
+				var mm = mypacket{
+					ip.SrcIP.String(),
+					ip.DstIP.String(),
+					ip.Protocol.String(),
+				}
+				flush2influxdb(mm)
+			}
+		}
+	}()
+
+	select {}
 }
